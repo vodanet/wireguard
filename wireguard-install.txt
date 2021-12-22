@@ -1,0 +1,19 @@
+- Docker Image Wireguard erstellen....
+- im Docker Image 
+
+
+
+CLIENT
+
+- ab Linux-Kernel Version 5.6 ist wireguard integrier 
+- apt-get install wireguard
+- jeweilige peer*.conf auf client kopieren, bzw. dessen Inhalt in /etc/wireguard/wg0.conf einfügen
+- sudo systemctl enable wg-quick@wg0.service
+
+Weitere Infos:
+https://www.thomas-krenn.com/de/wiki/Ubuntu_Desktop_als_WireGuard_VPN_Client_konfigurieren
+https://www.the-digital-life.com/wireguard-docker/
+https://gist.github.com/chrisswanda/88ade75fc463dcf964c6411d1e9b20f4
+
+Add Client Wireguard:
+https://docs.pi-hole.net/guides/vpn/wireguard/client/
