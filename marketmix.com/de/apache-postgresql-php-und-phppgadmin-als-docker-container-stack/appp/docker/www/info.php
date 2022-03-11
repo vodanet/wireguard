@@ -1,0 +1,3 @@
+&lt;?php
+phpinfo();
+?&gt;

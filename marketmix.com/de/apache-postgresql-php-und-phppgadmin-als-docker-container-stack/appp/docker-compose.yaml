@@ -1,0 +1,94 @@
+# APPP 1.0.0
+#
+# Runs Apache, Postgres, PHP (+Redis) and phpPgAdmin
+# SSL is preconfigured.
+# Imagemagick and XDebug are activated.
+#
+# Run with 
+# docker-compose up -d
+#
+# (c)2020 Harald Schneider
+#
+ 
+version: "3"
+ 
+services:
+ 
+  # --- PostgreSQL 12
+  #
+  postgresql:
+    container_name: "appp-postgresql"
+    image: bitnami/postgresql:12
+    #build: ./build/postgresql
+    environment:
+      - POSTGRESQL_USERNAME=admin
+      - POSTGRESQL_PASSWORD=YOUR_PASSWORD_HERE
+      - POSTGRESQL_ENABLE_TLS=yes
+      - POSTGRESQL_TLS_CERT_FILE=/certs/server.crt
+      - POSTGRESQL_TLS_KEY_FILE=/certs/server.key
+      # Use Bitnami's certs:
+      #- POSTGRESQL_TLS_CERT_FILE=/opt/bitnami/postgresql/certs/postgres.crt
+      #- POSTGRESQL_TLS_KEY_FILE=/opt/bitnami/postgresql/certs/postgres.key
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./docker/postgresql:/bitnami/postgresql
+      - ./docker/postgresql/certs:/certs
+    command: >
+      chmod 600 /certs/server.key
+      && chown postgres:postgres /certs/server.key
+ 
+  # --- PHP 7.4
+  #
+  php:
+    container_name: "appp-php"
+    image: bitnami/php-fpm:7.4
+    depends_on:
+      - redis
+    volumes:
+      - ./docker/www:/app:delegated
+      - ./docker/php/php.ini:/opt/bitnami/php/etc/conf.d/php.ini:ro
+ 
+  # --- Apache 2.4
+  #
+  apache:
+    container_name: "appp-apache"
+    image: bitnami/apache:2.4
+    ports:
+      - '80:8080'
+      - '443:8443'
+    depends_on:
+      - php
+    volumes:
+      - ./docker/www:/app:delegated
+      - ./docker/apache/my_vhost.conf:/vhosts/myapp.conf:ro
+      - ./docker/apache/certs:/certs
+      # Use this for bitnami's builtin certs:
+      # ./docker/apache/certs:/opt/bitnami/apache2/conf/bitnami/certs 
+ 
+  # --- Redis 6.0
+  #
+  redis:
+    container_name: "appp-redis"
+    image: bitnami/redis:6.0
+    environment:
+      - REDIS_PASSWORD=at15jx13
+ 
+  # --- PhpPgAdmin latest
+  # Acccess via
+  # http://127.0.0.1:82 or https://127.0.0.1:8243
+  #
+  phppgadmin:
+    container_name: "appp-phppgadmin"
+    image: bitnami/phppgadmin:latest
+    depends_on:
+      - postgresql
+    ports:
+      - '82:8080'
+      - '8243:8443'
+    environment:
+      - DATABASE_HOST=host.docker.internal
+ 
+volumes:
+  appp-mysql:
+    driver: local
