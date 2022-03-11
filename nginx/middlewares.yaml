@@ -1,0 +1,14 @@
+---
+# Strip prefix /mbvdmonitor 
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: test-stripprefix
+  namespace: nginx2
+spec:
+  stripPrefix:
+    prefixes:
+      - /mbvdmonitor
+      - /123/456
+
+---

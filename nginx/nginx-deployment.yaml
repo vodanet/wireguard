@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - image: nginx
+          name: nginx
+          ports:
+            - containerPort: 80
+          #volumeMounts:
+          #- name: config-volume
+          #  mountPath: /etc/nginx/nginx.conf
+          #  subPath: nginx.conf
+      volumes:
+        - name: config-volume
+          configMap:
+            name: nginx-configmap
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx
+  ports:
+    - port: 80            

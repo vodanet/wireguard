@@ -1,0 +1,30 @@
+# Strip prefix /mbvdmonitor 
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: replace-path
+  namespace: nginx2
+spec:
+  replacePath:
+      path: /0815 # hier kann der Pfad hin, der bei NGINX kommen soll
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mbvd-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: nginx2-replace-path@kubernetescrd
+spec:
+  rules:
+    - host: 
+      http:
+        paths:
+          - path: /mbvdmonitor
+            pathType: Prefix
+            backend:
+              service:
+                name: whoami-svc
+                port:
+                  number: 80  

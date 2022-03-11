@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+
+  annotations:
+    #traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.localhost/router.entrypoints: web
+    #traefik.localhost/router.middlewares: nginx-test-stripprefix@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: nginx-test-stripprefix@kubernetescrd
+spec:
+  rules:
+    - host: whoami.nginx.demo
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-service
+                port:
+                  number: 80
+
+
